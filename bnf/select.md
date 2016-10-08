@@ -26,10 +26,7 @@ SELECT DISTINCT job FROM emp;
 ### BNF
 `SELECT カラム FROM テーブル名;`が最小構成
 
-+ `SELECT`, `FROM`, `;`はそれぞれ文字列
- + **todo:** BNFって文字列の大文字小文字はどうなるの？
 + `テーブル名`は1-30文字の単語
- + **todo:** 利用可能な英数字って？
  + 利用可能英数字のみの30文字以下は頻出するので抽象化する
 + `カラム`は以下の2パターン
  + `ALL/DISTINCT カラム名`
@@ -40,17 +37,11 @@ SELECT DISTINCT job FROM emp;
 ```
 SelectQuery ::= 'SELECT' SelectColumns 'FROM' ValidName ';'
 
-ValidName ::= todo 英数字30
+ValidName ::= [A-Za-z0-9_-]{1,30}
 ValidNames ::= ValidName (',' ValidName)*
 
 SelectColumns ::= '*' | ('ALL' | 'DISTINCT')? ValidNames
 ```
-
-#### Todo
-+ 任意長の空白ってどうなるの？
- + そういうものを定義するの？
-+ `('ALL' | 'DISTINCT')?`とか`(',' ValidName)*`みたいな`()`ってあり？
-+ カンマで繋ぐカラム数って上限ある？
 
 ## WHERE
 ### SQL
@@ -67,7 +58,6 @@ SELECT * FROM emp WHERE deptno != 10;
 
 + カラム名と値を比べる
 + カラム名と式?を比べる
-+ **todo** カラム名とカラム名で比較って出来るの？
 
 #### IN
 ```Sql
@@ -119,12 +109,12 @@ SELECT * FROM emp WHERE NOT (deptno = 10);
 
 ```
 WhereCondition ::= 'WHERE' Condition (('AND' | 'OR') Condition)* 
-Condition ::= 'NOT'? (OperatorCondition | InCondition | BetweenCondition | IsCondition)
+Condition ::= 'NOT'? (ComparisonCondition | InCondition | BetweenCondition | IsCondition)
 
 Value ::= todo 値とか式とかそんなん
 Values :: =  Value (',' Value)*
 
-OperatorCondition ::= ValidName ('=' | '<' | '>' | '<=' | '>=' | '!=') Value
+ComparisonCondition ::= ValidName ('=' | '<' | '>' | '<=' | '>=' | '!=') Value
 InCondition ::= ValidName 'IN' '(' Values ')'
 BetweenCondition ::= 'BETWEEN' Value 'AND' Value
 IsCondition ::= Value 'IS' 'NULL'
