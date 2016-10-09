@@ -1,11 +1,15 @@
-object SelectQueryParser extends OracleParsers {
-  def selectQuery = select ~ selectColumns ~ from ~ tableName ~ ";"
+object SelectQueryParser extends OracleParser with WhereCondition {
+  def selectQuery = select ~ selectColumns ~ from ~ tableName ~ opt(whereCondition) ~ ";"
 
-  def select = "(?i)SELECT".r
+  def select = keyword("SELECT")
 
-  def selectColumns = "*" | opt("ALL" | "DISTINCT") ~ validNames
+  def selectColumns = "*" | opt(all | distinct) ~ validNames
 
-  def from = "(?i)FROM".r
+  def from = keyword("FROM")
+
+  override def all = keyword("ALL")
+
+  def distinct = keyword("DISTINCT")
 
 
   def apply(input: String) = parseAll(selectQuery, input)

@@ -48,7 +48,7 @@ SelectColumns ::= '*' | ('ALL' | 'DISTINCT')? ValidNames
 `where`に続けて条件を書く
 
 #### 比較演算子
-`=`, `<`, `>`, `<=`, `>=`, `!=`
+`=`, `<`, `>`, `<=`, `>=`, `!=`, `^=`, `<>`
 
 ```Sql
 SELECT * FROM emp WHERE deptno = 10;
@@ -57,7 +57,6 @@ SELECT * FROM emp WHERE deptno != 10;
 ```
 
 + カラム名と値を比べる
-+ カラム名と式?を比べる
 
 #### IN
 ```Sql
@@ -65,15 +64,25 @@ SELECT * FROM emp WHERE empnu IN (7369,7499,7521);
 SELECT * FROM emp WHERE job IN ('CLERK','ANALYST');
 ```
 
+`NOT`を付けることが出来る -> `NOT IN`
+
 #### BETWEEN
 ```Sql
-SELECT * FROM EMP WHERE SAL BETWEEN 1000 AND 2000;
+SELECT * FROM emp WHERE sal BETWEEN 1000 AND 2000;
 ```
 
-#### IS
+`NOT`を付けることが出来る -> `NOT BETWEEN`
 
+#### IS
 ```Sql
-SELECT * FROM EMP WHERE MGR IS NULL;
+SELECT * FROM emp WHERE mgr IS NULL;
+```
+
+`NOT`を付けることが出来る -> `IS NOT`
+
+#### ALL/ANY/SOME
+```Sql
+SELECT * FROM dept WHERE loc = SOME ('NEW YORK', 'DALLAS');
 ```
 
 #### LIKE
@@ -85,13 +94,6 @@ SELECT * FROM emp WHERE deptno = 10 AND sql >= 5000;
 SELECT * FROM emp WHERE deptno = 10 OR sql >= 5000;
 ```
 
-#### NOT
-条件には`NOT`を付けられる
-
-```Sql
-SELECT * FROM emp WHERE NOT (deptno = 10);
-```
-
 ### BNF
 `WHERE 条件;`が最小構成
 
@@ -101,23 +103,28 @@ SELECT * FROM emp WHERE NOT (deptno = 10);
 + `IN`
 + `BETWEEN`
 + `IS`
++ `ALL`, `ANY`, `SOME`
 + ~~`LIKE`~~
 
-条件には`NOT`を付ける事が出来、`AND`, `OR`で結合する事も出来る
+条件は`AND`, `OR`で結合する事が出来る
+
+値は計算結果でも良い気がするが、一旦考えないことにする
 
 ここまでを起こすと以下
 
 ```
 WhereCondition ::= 'WHERE' Condition (('AND' | 'OR') Condition)* 
-Condition ::= 'NOT'? (ComparisonCondition | InCondition | BetweenCondition | IsCondition)
+Condition ::= ComparisonCondition | InCondition | BetweenCondition | IsCondition | PluralCondition
 
-Value ::= todo 値とか式とかそんなん
-Values :: =  Value (',' Value)*
+Value ::= [a-zA-Z]+ | [1-9][0-9]*
+Values ::=  Value (',' Value)*
 
-ComparisonCondition ::= ValidName ('=' | '<' | '>' | '<=' | '>=' | '!=') Value
-InCondition ::= ValidName 'IN' '(' Values ')'
-BetweenCondition ::= 'BETWEEN' Value 'AND' Value
-IsCondition ::= Value 'IS' 'NULL'
+Operator ::= ('=' | '<' | '>' | '<=' | '>=' | '!=' | '^=' | '<>')
+ComparisonCondition ::= ValidName Operator Value
+InCondition ::= ValidName 'NOT'? ~ 'IN' '(' Values ')'
+BetweenCondition ::= ValidName 'NOT'? 'BETWEEN' Value 'AND' Value
+IsCondition ::= Value 'IS' 'NOT'? 'NULL'
+PluralCondition ::= ValidName Operator ('ALL' | 'ANY' | 'SOME') '(' Values ')'
 ```
 
 `SelectQuery`と結合
