@@ -1,5 +1,3 @@
-package paser
-
 object SelectQueryParser extends OracleParsers {
   def selectQuery = select ~ selectColumns ~ from ~ tableName ~ ";"
 
@@ -10,7 +8,5 @@ object SelectQueryParser extends OracleParsers {
   def from = "(?i)FROM".r
 
 
-  def apply(input: String) = println(
-    parseAll(selectQuery, input)
-  )
+  def apply(input: String) = parseAll(selectQuery, input)
 }

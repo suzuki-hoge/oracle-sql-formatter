@@ -1,5 +1,3 @@
-package paser
-
 import scala.util.parsing.combinator.JavaTokenParsers
 
 class OracleParsers extends JavaTokenParsers {
