@@ -1,83 +1,51 @@
 import org.scalatest.FunSuite
 
-class OracleParserTest extends FunSuite with ParserAssert {
+class OracleParserTest extends FunSuite {
 
   object Parser extends OracleParser {
-    def _keyword = keyword("foo")
+    def _keyword(arg: String, s: String) = parseAll(keyword(arg), s)
 
-    def _rec = rec("foo")
+    def _col(s: String) = parseAll(col, s)
 
-    def _brc = brc("foo")
+    def _cols(s: String) = parseAll(cols, s)
+
+    def _table(s: String) = parseAll(table, s)
   }
 
-  test("valid validName") {
-    val inputs = List(
-      "abc", "ABC", "012", "_", "-", "a_A-0", "-_"
-    )
-
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser.validName, _).isEmpty)
-    )
-  }
-
-  test("invalid validName") {
-    val inputs = List(
-      "", "0000011111222223333344444555556", "foo.com", "bar@com"
-    )
-
-    assertAllTrue(
-      inputs.map(Parser.parseAll(Parser.validName, _).isEmpty)
-    )
-  }
-
-  test("valid value") {
-    val inputs = List(
-      "'abc'", "'ABC'", "123", "890"
-    )
-
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser.value, _).isEmpty)
-    )
-  }
-
-  test("invalid values") {
-    val inputs = List(
-      "'ab12'", "'a_b'", "012"
-    )
-
-    assertAllTrue(
-      inputs.map(Parser.parseAll(Parser.value, _).isEmpty)
-    )
-  }
 
   test("valid keyword") {
-    val inputs = List(
-      "foo", "FOO"
-    )
-
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser._keyword, _).isEmpty)
+    assert(
+      Parser._keyword("foo", "foo").get == Keyword("foo")
     )
   }
 
-  test("valid recursive") {
-    val inputs = List(
-      "foo", "foo,foo", "foo, foo", "foo,  foo"
+  test("valid col") {
+    assert(
+      Parser._col("a_B-1").get == Col("a_B-1")
     )
 
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser._rec, _).isEmpty)
+    assert(
+      Parser._col("").isEmpty
+    )
+
+    assert(
+      Parser._col("0000011111222223333344444555556").isEmpty
+    )
+
+    assert(
+      Parser._col("a b").isEmpty
     )
   }
 
-
-  test("valid brackets") {
-    val inputs = List(
-      "(foo)"
+  test("valid cols") {
+    assert(
+      Parser._cols("foo, bar").get == Cols(Seq("foo", "bar"))
     )
+  }
 
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser._brc, _).isEmpty)
+  test("valid table") {
+    assert(
+      Parser._table("books").get == Table("books")
     )
   }
 }

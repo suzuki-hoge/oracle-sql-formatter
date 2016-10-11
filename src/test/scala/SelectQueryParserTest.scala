@@ -1,47 +1,50 @@
 import org.scalatest.FunSuite
 
-class SelectQueryParserTest extends FunSuite with ParserAssert {
+class SelectQueryParserTest extends FunSuite {
   test("valid select query missing where") {
-    val inputs = List(
-      "SELECT * FROM books;",
-      "SELECT id, name FROM books;",
-      "SELECT ALL id, name FROM books;",
-      "SELECT book_id, book-name FROM books;"
+    assert(
+      SelectQueryParser("SELECT * FROM books;").right.get == SelectResult(
+        Asterisk("*"),
+        Table("books"),
+        None
+      )
     )
 
-    assertAllFalse(
-      inputs.map(SelectQueryParser(_).isEmpty)
-    )
-  }
-
-  test("invalid select query missing where") {
-    val inputs = List(
-      "SELECT ALL DISTINCT id, name FROM books;"
+    assert(
+      SelectQueryParser("SELECT id, name FROM books;").right.get == SelectResult(
+        Columns(None, Cols(List("id", "name"))),
+        Table("books"),
+        None
+      )
     )
 
-    assertAllTrue(
-      inputs.map(SelectQueryParser(_).isEmpty)
+    assert(
+      SelectQueryParser("SELECT all id, name FROM books;").right.get == SelectResult(
+        Columns(Some(Keyword("all")), Cols(List("id", "name"))),
+        Table("books"),
+        None
+      )
     )
   }
 
   test("valid select query") {
-    val inputs = List(
-      "SELECT * FROM books WHERE name = 'foo';",
-      "SELECT DISTINCT id, name FROM books WHERE name = 'foo' OR id BETWEEN 1 AND 5;"
-    )
-
-    assertAllFalse(
-      inputs.map(SelectQueryParser(_).isEmpty)
+    assert(
+      SelectQueryParser("SELECT * FROM books WHERE name = 'foo' AND job IS NOT NULL;").right.get == SelectResult(
+        Asterisk("*"),
+        Table("books"),
+        Some(WhereResult(
+          Seq(
+            ComparisonCondition(Col("name"), Operator("="), Value("foo")),
+            IsCondition(Col("job"), Some(Keyword("not")))
+          )
+        ))
+      )
     )
   }
 
-  test("invalid select query") {
-    val inputs = List(
-      "SELECT * FROM books WHERE;"
-    )
-
-    assertAllTrue(
-      inputs.map(SelectQueryParser(_).isEmpty)
+  test("invalid") {
+    assert(
+      SelectQueryParser("SELECT * FROM;") == Left("error on line 1")
     )
   }
 }

@@ -1,51 +1,75 @@
 import org.scalatest.FunSuite
 
-class WhereConditionTest extends FunSuite with ParserAssert {
+class WhereConditionTest extends FunSuite {
 
   object Parser extends WhereCondition
 
+  val not = Some(Keyword("not"))
+
   test("valid condition") {
-    val inputs = List(
-      "name = 'foo'",
-
-      "name IN ('foo', 'bar')",
-      "name NOT IN ('foo', 'bar')",
-
-      "rate BETWEEN 1000 AND 2000",
-      "rate NOT BETWEEN 1000 AND 2000",
-
-      "job IS NULL",
-      "job IS NOT NULL",
-
-      "location = ANY ('foo', 'bar')",
-      "job IS NOT NULL"
+    assert(
+      Parser.parseAll(Parser.condition, "name = 'foo'").get == ComparisonCondition(
+        Col("name"), Operator("="), Value("foo")
+      )
     )
 
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser.condition, _).isEmpty)
+    assert(
+      Parser.parseAll(Parser.condition, "name IN ('foo', 'bar')").get == InCondition(
+        Col("name"), None, Values(Seq("foo", "bar"))
+      )
+    )
+
+    assert(
+      Parser.parseAll(Parser.condition, "name NOT IN ('foo', 'bar')").get == InCondition(
+        Col("name"), not, Values(Seq("foo", "bar"))
+      )
+    )
+
+    assert(
+      Parser.parseAll(Parser.condition, "rate BETWEEN 1000 AND 2000").get == BetweenCondition(
+        Col("rate"), None, Value("1000"), Value("2000")
+      )
+    )
+
+    assert(
+      Parser.parseAll(Parser.condition, "rate NOT BETWEEN 1000 AND 2000").get == BetweenCondition(
+        Col("rate"), not, Value("1000"), Value("2000")
+      )
+    )
+
+    assert(
+      Parser.parseAll(Parser.condition, "job IS NULL").get == IsCondition(
+        Col("job"), None
+      )
+    )
+
+    assert(
+      Parser.parseAll(Parser.condition, "job IS NOT NULL").get == IsCondition(
+        Col("job"), not
+      )
+    )
+
+    assert(
+      Parser.parseAll(Parser.condition, "location = ANY ('foo', 'bar')").get == PluralCondition(
+        Col("location"), Operator("="), Keyword("any"), Values(Seq("foo", "bar"))
+      )
     )
   }
 
-  test("valid conditions") {
-    val inputs = List(
-      "name = 'foo' AND job IS NOT NULL",
-
-      "name IN ('foo', 'bar') OR rate BETWEEN 1000 AND 2000"
-    )
-
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser.conditions, _).isEmpty)
+  test("valid where") {
+    assert(
+      Parser.parseAll(Parser.whereCondition, "WHERE name = 'foo' AND job IS NOT NULL").get == WhereResult(
+        Seq(
+          ComparisonCondition(Col("name"), Operator("="), Value("foo")),
+          IsCondition(Col("job"), not)
+        )
+      )
     )
   }
 
-  test("valid where condition") {
-    val inputs = List(
-      "WHERE name = 'foo' AND job IS NOT NULL"
-    )
-
-    assertAllFalse(
-      inputs.map(Parser.parseAll(Parser.whereCondition, _).isEmpty)
+  test("invalid where") {
+    assert(
+      Parser.parseAll(Parser.whereCondition, "WHERE name").isEmpty
     )
   }
 }
-
