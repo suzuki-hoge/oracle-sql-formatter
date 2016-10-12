@@ -1,3 +1,5 @@
+package parser
+
 case class SelectResult(cols: SelectColumns, tableName: Table, where: Option[WhereResult])
 
 trait SelectColumns

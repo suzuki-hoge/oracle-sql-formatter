@@ -1,3 +1,5 @@
+package parser
+
 import org.scalatest.FunSuite
 
 class OracleParserTest extends FunSuite {

@@ -1,3 +1,5 @@
+package parser
+
 import scala.util.parsing.combinator.JavaTokenParsers
 
 case class Keyword(value: String)

@@ -1,3 +1,5 @@
+package parser
+
 import org.scalatest.FunSuite
 
 class WhereConditionTest extends FunSuite {

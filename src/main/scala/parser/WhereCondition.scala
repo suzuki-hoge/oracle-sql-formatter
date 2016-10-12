@@ -1,3 +1,5 @@
+package parser
+
 case class WhereResult(conditions: Seq[Condition])
 
 trait Condition
