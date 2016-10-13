@@ -16,7 +16,10 @@ trait OracleFormatter {
   }
 
   def convert(table: Table): String = {
-    table.value.toLowerCase
+    Indent.++()
+    val s = s"${Indent.current}${table.value.toLowerCase}"
+    Indent.--()
+    s
   }
 
   def convert(value: Value): String = {
@@ -27,9 +30,20 @@ trait OracleFormatter {
   }
 
   def convert(values: Values): String = {
-    values match {
-      case vs: StringValues => s"(${vs.values.map(convert).mkString(", ")})"
-      case vs: IntValues => s"(${vs.values.map(convert).mkString(", ")})"
+    var result: String = "(\n"
+    Indent.++()
+    result += Indent.current
+
+    val s: String = values match {
+      case vs: StringValues => s"${vs.values.map(convert).mkString(s"\n${Indent.current}, ")}"
+      case vs: IntValues => s"${vs.values.map(convert).mkString(s"\n${Indent.current}, ")}"
     }
+
+    result += s
+
+    Indent.--()
+    result += s"\n${Indent.current})"
+
+    result
   }
 }

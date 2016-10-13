@@ -6,22 +6,40 @@ import parser._
 class SelectFormatterTest extends FunSuite {
 
   test("select missing where") {
+    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), None)
-      ) == "SELECT * FROM books;"
+      ) ==
+        """SELECT
+           |  *
+           |FROM
+           |  books
+           |;""".stripMargin
     )
 
+    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Columns(None, Cols(Seq(Col("foo"), Col("bar")))), Table("BOOKS"), None)
-      ) == "SELECT foo, bar FROM books;"
+      ) ==
+        """SELECT
+          |  foo, bar
+          |FROM
+          |  books
+          |;""".stripMargin
     )
 
+    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Columns(Option(Keyword("distinct")), Cols(Seq(Col("foo"), Col("bar")))), Table("BOOKS"), None)
-      ) == "SELECT DISTINCT foo, bar FROM books;"
+      ) ==
+        """SELECT DISTINCT
+          |  foo, bar
+          |FROM
+          |  books
+          |;""".stripMargin
     )
   }
 
@@ -35,10 +53,19 @@ class SelectFormatterTest extends FunSuite {
       )
     )
 
+    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), Option(where))
-      ) == "SELECT * FROM books WHERE name = 'foo' AND rate NOT BETWEEN 1000 AND 2000;"
+      ) ==
+        """SELECT
+          |  *
+          |FROM
+          |  books
+          |WHERE
+          |  name = 'foo'
+          |  AND rate NOT BETWEEN 1000 AND 2000
+          |;""".stripMargin
     )
   }
 }
