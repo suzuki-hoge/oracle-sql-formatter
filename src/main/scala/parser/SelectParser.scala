@@ -1,6 +1,6 @@
 package parser
 
-case class SelectResult(cols: SelectColumns, tableName: Table, where: Option[WhereResult])
+case class SelectResult(cols: SelectColumns, table: Table, where: Option[WhereResult])
 
 trait SelectColumns
 
@@ -8,7 +8,7 @@ case class Asterisk(value: String) extends SelectColumns
 
 case class Columns(option: Option[Keyword], names: Cols) extends SelectColumns
 
-object SelectQueryParser extends OracleParser with WhereCondition {
+object SelectParser extends WhereCondition {
   def selectQuery = select ~> selectColumns ~ (from ~> table) ~ opt(whereCondition) <~ ";" ^^ {
     case cols ~ table ~ where => SelectResult(cols, table, where)
   }
