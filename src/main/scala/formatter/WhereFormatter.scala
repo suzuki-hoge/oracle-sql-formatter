@@ -7,8 +7,8 @@ trait WhereFormatter extends OracleFormatter {
     s"WHERE ${convert(result.conditions)}"
   }
 
-  private def convert(conditions: Seq[Condition]): String = {
-    conditions.map(convert).mkString(" todo ")
+  private def convert(conditions: Conditions): String = {
+    (Seq(convert(conditions.head)) ++ conditions.tail.map(convert)).mkString(" ")
   }
 
   private def convert(condition: Condition): String = {
@@ -19,6 +19,10 @@ trait WhereFormatter extends OracleFormatter {
       case c: IsCondition => s"${c.col.value} ${keyWithNot(c)} NULL"
       case c: PluralCondition => s"${c.col.value} ${c.operator.value} ${convert(c.keyword)} ${convert(c.values)}"
     }
+  }
+
+  private def convert(tailCondition: (Keyword, Condition)): String = {
+    s"${convert(tailCondition._1)} ${convert(tailCondition._2)}"
   }
 
   private def keyWithNot(condition: Condition): String = {

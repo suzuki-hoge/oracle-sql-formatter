@@ -9,7 +9,9 @@ class WhereFormatterTest extends FunSuite {
 
   val not = Some(Keyword("not"))
 
-  def create(conditions: Condition*): WhereResult = WhereResult(conditions)
+  def create(head: Condition): WhereResult = create(head, Seq())
+
+  def create(head: Condition, tails: Seq[(Keyword, Condition)]): WhereResult = WhereResult(Conditions(head, tails))
 
   test("condition") {
     assert(
@@ -48,9 +50,9 @@ class WhereFormatterTest extends FunSuite {
       Formatter.convert(
         create(
           ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-          BetweenCondition(Col("rate"), not, IntValue("1000"), IntValue("2000"))
+          Seq((Keyword("and"), BetweenCondition(Col("rate"), not, IntValue("1000"), IntValue("2000"))))
         )
-      ) == "WHERE name = 'foo' todo rate NOT BETWEEN 1000 AND 2000"
+      ) == "WHERE name = 'foo' AND rate NOT BETWEEN 1000 AND 2000"
     )
   }
 }

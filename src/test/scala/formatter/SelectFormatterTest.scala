@@ -27,16 +27,18 @@ class SelectFormatterTest extends FunSuite {
 
   test("select") {
     val where = WhereResult(
-      Seq(
+      Conditions(
         ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-        BetweenCondition(Col("rate"), Option(Keyword("not")), IntValue("1000"), IntValue("2000"))
+        Seq(
+          (Keyword("and"), BetweenCondition(Col("rate"), Option(Keyword("not")), IntValue("1000"), IntValue("2000")))
+        )
       )
     )
 
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), Option(where))
-      ) == "SELECT * FROM books WHERE name = 'foo' todo rate NOT BETWEEN 1000 AND 2000;"
+      ) == "SELECT * FROM books WHERE name = 'foo' AND rate NOT BETWEEN 1000 AND 2000;"
     )
   }
 }

@@ -61,9 +61,9 @@ class WhereConditionTest extends FunSuite {
   test("valid where") {
     assert(
       Parser.parseAll(Parser.whereCondition, "WHERE name = 'foo' AND job IS NOT NULL").get == WhereResult(
-        Seq(
+        Conditions(
           ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-          IsCondition(Col("job"), not)
+          Seq((Keyword("and"), IsCondition(Col("job"), not)))
         )
       )
     )

@@ -34,12 +34,12 @@ class SelectParserTest extends FunSuite {
       SelectParser("SELECT * FROM books WHERE name = 'foo' AND job IS NOT NULL;").right.get == SelectResult(
         Asterisk("*"),
         Table("books"),
-        Some(WhereResult(
+        Some(WhereResult(Conditions(
+          ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
           Seq(
-            ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-            IsCondition(Col("job"), Some(Keyword("not")))
+            (Keyword("and"), IsCondition(Col("job"), Some(Keyword("not"))))
           )
-        ))
+        )))
       )
     )
   }
