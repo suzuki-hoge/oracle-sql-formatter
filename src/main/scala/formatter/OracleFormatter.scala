@@ -3,6 +3,25 @@ package formatter
 import parser._
 
 trait OracleFormatter {
+  def __ = Indent.current
+
+  def >>[T](f: T => String, arg: T): String = {
+    Indent.++()
+    val s = f(arg)
+    Indent.--()
+    s
+  }
+
+  def brc[T](f: T => String, arg: T): String = {
+    var s = "(\n"
+    Indent.++()
+    s += f(arg)
+    Indent.--()
+    s += s"\n${__})"
+
+    s
+  }
+
   def convert(col: Col): String = {
     col.value.toLowerCase
   }
@@ -16,10 +35,7 @@ trait OracleFormatter {
   }
 
   def convert(table: Table): String = {
-    Indent.++()
-    val s = s"${Indent.current}${table.value.toLowerCase}"
-    Indent.--()
-    s
+    >>((table: Table) => s"${__}${table.value.toLowerCase}", table)
   }
 
   def convert(value: Value): String = {
@@ -30,20 +46,9 @@ trait OracleFormatter {
   }
 
   def convert(values: Values): String = {
-    var result: String = "(\n"
-    Indent.++()
-    result += Indent.current
-
-    val s: String = values match {
-      case vs: StringValues => s"${vs.values.map(convert).mkString(s"\n${Indent.current}, ")}"
-      case vs: IntValues => s"${vs.values.map(convert).mkString(s"\n${Indent.current}, ")}"
-    }
-
-    result += s
-
-    Indent.--()
-    result += s"\n${Indent.current})"
-
-    result
+    brc((values: Values) => values match {
+      case vs: StringValues => s"${__}${vs.values.map(convert).mkString(s"\n${__}, ")}"
+      case vs: IntValues => s"${__}${vs.values.map(convert).mkString(s"\n${__}, ")}"
+    }, values)
   }
 }

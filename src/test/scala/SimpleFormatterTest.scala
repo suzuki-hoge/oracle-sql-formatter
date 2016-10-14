@@ -1,5 +1,6 @@
 import formatter.Indent
 import org.scalatest.FunSuite
+import parser.Keyword
 
 class SimpleFormatterTest extends FunSuite {
   test("select re-format") {
@@ -57,6 +58,10 @@ class SimpleFormatterTest extends FunSuite {
         """.stripMargin
       ).left.get == "error on line 3"
     )
+  }
+
+  def out(keyword: Keyword): String = {
+    s"${Indent}keyword.value"
   }
 }
 

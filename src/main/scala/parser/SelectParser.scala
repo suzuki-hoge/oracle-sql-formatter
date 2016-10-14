@@ -27,7 +27,7 @@ object SelectParser extends WhereCondition {
 
 
   def apply(input: String): Either[String, SelectResult] = parseAll(selectQuery, input) match {
-    case Success(result, next) => Right(result)
-    case NoSuccess(error, next) => Left(s"error on line ${next.pos.line}")
+    case Success(result, _) => Right(result)
+    case NoSuccess(_, next) => Left(s"error on line ${next.pos.line}")
   }
 }
