@@ -46,9 +46,7 @@ trait OracleFormatter {
   }
 
   def convert(values: Values): String = {
-    brc((values: Values) => values match {
-      case vs: StringValues => s"${__}${vs.values.map(convert).mkString(s"\n${__}, ")}"
-      case vs: IntValues => s"${__}${vs.values.map(convert).mkString(s"\n${__}, ")}"
-    }, values)
+    brc((values: Values) => s"${__}${values.values.map(convert).mkString(s"\n${__}, ")}"
+      , values)
   }
 }

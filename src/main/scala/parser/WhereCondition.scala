@@ -2,7 +2,7 @@ package parser
 
 case class WhereResult(conditions: Conditions)
 
-case class Conditions(head: Condition, tail: Seq[(Keyword, Condition)])
+case class Conditions(head: Condition, tail: (Keyword, Condition)*)
 
 sealed trait Condition
 
@@ -23,7 +23,7 @@ trait WhereCondition extends OracleParser {
 
   def where = keyword("WHERE")
 
-  def conditions = condition ~ rep(tailCondition) ^^ {case cond ~ tails => Conditions(cond, tails)}
+  def conditions = condition ~ rep(tailCondition) ^^ {case cond ~ tails => Conditions(cond, tails:_*)}
 
   def tailCondition = (and | or) ~ condition ^^ {case key ~ cond => (key, cond)}
 

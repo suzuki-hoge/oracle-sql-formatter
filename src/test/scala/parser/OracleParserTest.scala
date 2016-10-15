@@ -41,7 +41,7 @@ class OracleParserTest extends FunSuite {
 
   test("valid cols") {
     assert(
-      Parser._cols("foo, bar").get == Cols(Seq(Col("foo"), Col("bar")))
+      Parser._cols("foo, bar").get == Cols(Col("foo"), Col("bar"))
     )
   }
 
