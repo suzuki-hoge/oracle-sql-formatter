@@ -1,24 +1,30 @@
 package formatter
 
-import parser.{Asterisk, Columns, SelectColumns, SelectResult}
+import parser._
 
-object SelectFormatter extends WhereFormatter {
-  def convert(result: SelectResult): String = {
-    val where = result.where match {
-      case Some(x) => convert(x) + "\n"
-      case None => ""
-    }
+object ColumnsOf extends OracleFormatter {
+  def unapply(c: Columns): Option[(String, String)] = c match {
+    case Columns(option, names) => Some(option.fold("")(" " + convert(_)), convert(names))
+    case _ => None
+  }
+}
 
-    s"SELECT${convert(result.cols)}\nFROM\n${convert(result.table)}\n$where;"
+object SelectResultOf extends WhereFormatter {
+  def unapply(r: SelectResult): Option[(String, String, String)] = r match {
+    case SelectResult(cols, table, where) => Some(convert(cols), convert(table), where.fold("")(convert(_) + "\n"))
+    case _ => None
   }
 
   private def convert(cols: SelectColumns): String = {
     >>((cols: SelectColumns) => cols match {
-      case cs: Asterisk => s"\n${__}*"
-      case cs: Columns => cs.option match {
-        case Some(option) => s" ${convert(option)}\n${__}${convert(cs.names)}"
-        case None => s"\n${__}${convert(cs.names)}"
-      }
+      case _: Asterisk => s"\n${__}*"
+      case ColumnsOf(opt, names) => s"$opt\n${__}$names"
     }, cols)
+  }
+}
+
+object SelectFormatter extends WhereFormatter {
+  def convert(result: SelectResult): String = result match {
+    case SelectResultOf(cols, table, where) => s"SELECT$cols\nFROM\n$table\n$where;"
   }
 }

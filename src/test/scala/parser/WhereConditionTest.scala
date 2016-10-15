@@ -17,13 +17,13 @@ class WhereConditionTest extends FunSuite {
 
     assert(
       Parser.parseAll(Parser.condition, "name IN ('foo', 'bar')").get == InCondition(
-        Col("name"), None, StringValues(Seq(StringValue("foo"), StringValue("bar")))
+        Col("name"), None, Values(StringValue("foo"), StringValue("bar"))
       )
     )
 
     assert(
       Parser.parseAll(Parser.condition, "name NOT IN ('foo', 'bar')").get == InCondition(
-        Col("name"), not, StringValues(Seq(StringValue("foo"), StringValue("bar")))
+        Col("name"), not, Values(StringValue("foo"), StringValue("bar"))
       )
     )
 
@@ -53,7 +53,7 @@ class WhereConditionTest extends FunSuite {
 
     assert(
       Parser.parseAll(Parser.condition, "location = ANY ('foo', 'bar')").get == PluralCondition(
-        Col("location"), Operator("="), Keyword("any"), StringValues(Seq(StringValue("foo"), StringValue("bar")))
+        Col("location"), Operator("="), Keyword("any"), Values(StringValue("foo"), StringValue("bar"))
       )
     )
   }
@@ -63,7 +63,7 @@ class WhereConditionTest extends FunSuite {
       Parser.parseAll(Parser.whereCondition, "WHERE name = 'foo' AND job IS NOT NULL").get == WhereResult(
         Conditions(
           ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-          Seq((Keyword("and"), IsCondition(Col("job"), not)))
+          (Keyword("and"), IsCondition(Col("job"), not))
         )
       )
     )

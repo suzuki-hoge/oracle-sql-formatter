@@ -14,7 +14,7 @@ class SelectParserTest extends FunSuite {
 
     assert(
       SelectParser("SELECT id, name FROM books;").right.get == SelectResult(
-        Columns(None, Cols(Seq(Col("id"), Col("name")))),
+        Columns(None, Cols(Col("id"), Col("name"))),
         Table("books"),
         None
       )
@@ -22,7 +22,7 @@ class SelectParserTest extends FunSuite {
 
     assert(
       SelectParser("SELECT all id, name FROM books;").right.get == SelectResult(
-        Columns(Some(Keyword("all")), Cols(Seq(Col("id"), Col("name")))),
+        Columns(Some(Keyword("all")), Cols(Col("id"), Col("name"))),
         Table("books"),
         None
       )
@@ -36,9 +36,7 @@ class SelectParserTest extends FunSuite {
         Table("books"),
         Some(WhereResult(Conditions(
           ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-          Seq(
-            (Keyword("and"), IsCondition(Col("job"), Some(Keyword("not"))))
-          )
+          (Keyword("and"), IsCondition(Col("job"), Some(Keyword("not"))))
         )))
       )
     )

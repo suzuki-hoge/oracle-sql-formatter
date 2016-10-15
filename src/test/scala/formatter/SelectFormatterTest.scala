@@ -12,16 +12,16 @@ class SelectFormatterTest extends FunSuite {
         SelectResult(Asterisk("*"), Table("books"), None)
       ) ==
         """SELECT
-           |  *
-           |FROM
-           |  books
-           |;""".stripMargin
+          |  *
+          |FROM
+          |  books
+          |;""".stripMargin
     )
 
     Indent.init("  ")
     assert(
       SelectFormatter.convert(
-        SelectResult(Columns(None, Cols(Seq(Col("foo"), Col("bar")))), Table("BOOKS"), None)
+        SelectResult(Columns(None, Cols(Col("foo"), Col("bar"))), Table("BOOKS"), None)
       ) ==
         """SELECT
           |  foo, bar
@@ -33,7 +33,7 @@ class SelectFormatterTest extends FunSuite {
     Indent.init("  ")
     assert(
       SelectFormatter.convert(
-        SelectResult(Columns(Option(Keyword("distinct")), Cols(Seq(Col("foo"), Col("bar")))), Table("BOOKS"), None)
+        SelectResult(Columns(Option(Keyword("distinct")), Cols(Col("foo"), Col("bar"))), Table("BOOKS"), None)
       ) ==
         """SELECT DISTINCT
           |  foo, bar
@@ -47,9 +47,7 @@ class SelectFormatterTest extends FunSuite {
     val where = WhereResult(
       Conditions(
         ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-        Seq(
-          (Keyword("and"), BetweenCondition(Col("rate"), Option(Keyword("not")), IntValue("1000"), IntValue("2000")))
-        )
+        (Keyword("and"), BetweenCondition(Col("rate"), Option(Keyword("not")), IntValue("1000"), IntValue("2000")))
       )
     )
 

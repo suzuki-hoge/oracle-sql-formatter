@@ -9,9 +9,9 @@ class WhereFormatterTest extends FunSuite {
 
   val not = Some(Keyword("not"))
 
-  def create(head: Condition): WhereResult = create(head, Seq())
+  def create(head: Condition): WhereResult = create(head, Seq.empty: _*)
 
-  def create(head: Condition, tails: Seq[(Keyword, Condition)]): WhereResult = WhereResult(Conditions(head, tails))
+  def create(head: Condition, tails: (Keyword, Condition)*): WhereResult = WhereResult(Conditions(head, tails: _*))
 
   test("condition") {
     Indent.init("  ")
@@ -26,7 +26,7 @@ class WhereFormatterTest extends FunSuite {
     Indent.init("  ")
     assert(
       Formatter.convert(
-        create(InCondition(Col("name"), None, StringValues(Seq(StringValue("foo"), StringValue("bar")))))
+        create(InCondition(Col("name"), None, Values(StringValue("foo"), StringValue("bar"))))
       ) ==
         """WHERE
           |  name IN (
@@ -56,7 +56,7 @@ class WhereFormatterTest extends FunSuite {
     Indent.init("  ")
     assert(
       Formatter.convert(
-        create(PluralCondition(Col("location"), Operator("="), Keyword("any"), StringValues(Seq(StringValue("foo"), StringValue("bar")))))
+        create(PluralCondition(Col("location"), Operator("="), Keyword("any"), Values(StringValue("foo"), StringValue("bar"))))
       ) ==
         """WHERE
           |  location = ANY (
@@ -72,7 +72,7 @@ class WhereFormatterTest extends FunSuite {
       Formatter.convert(
         create(
           ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
-          Seq((Keyword("and"), PluralCondition(Col("rate"), Operator("="), Keyword("any"), IntValues(Seq(IntValue("1000"), IntValue("2000"))))))
+          (Keyword("and"), PluralCondition(Col("rate"), Operator("="), Keyword("any"), Values(IntValue("1000"), IntValue("2000"))))
         )
       ) ==
         """WHERE

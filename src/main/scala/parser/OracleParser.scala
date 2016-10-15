@@ -6,32 +6,28 @@ case class Keyword(value: String)
 
 case class Col(value: String)
 
-case class Cols(values: Seq[Col])
+case class Cols(values: Col*)
 
-trait Value
+sealed abstract class Value(val value: String)
 
-case class StringValue(value: String) extends Value
+case class StringValue(override val value: String) extends Value(value)
 
-case class IntValue(value: String) extends Value
+case class IntValue(override val value: String) extends Value(value)
 
-trait Values
-
-case class StringValues(values: Seq[StringValue]) extends Values
-
-case class IntValues(values: Seq[IntValue]) extends Values
+case class Values(values: Value*)
 
 case class Table(value: String)
 
 trait OracleParser extends JavaTokenParsers {
   // functions
-  def keyword(s: String) = "(?i)%s".format(s).r ^^ (it => Keyword(it.toLowerCase))
+  def keyword(s: String) = s"(?i)$s".r ^^ (it => Keyword(it.toLowerCase))
 
   // commons
   private def oracleWord = "[a-zA-Z0-9_-]{1,30}".r
 
   def col = oracleWord ^^ Col
 
-  def cols = repsep(col, ",") ^^ Cols
+  def cols = repsep(col, ",") ^^ (it => Cols(it: _*))
 
   def value = stringValue | intValue // halfheartedly
 
@@ -41,9 +37,9 @@ trait OracleParser extends JavaTokenParsers {
 
   def values = stringValues | intValues
 
-  def stringValues = repsep(stringValue, ",") ^^ StringValues
+  def stringValues = repsep(stringValue, ",") ^^ (it => Values(it: _*))
 
-  def intValues = repsep(intValue, ",") ^^ IntValues
+  def intValues = repsep(intValue, ",") ^^ (it => Values(it: _*))
 
   def table = oracleWord ^^ Table
 }
