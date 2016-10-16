@@ -1,6 +1,10 @@
-case class WhereResult(conditions: Seq[Condition])
+package parser
 
-trait Condition
+case class WhereResult(conditions: Conditions)
+
+case class Conditions(head: Condition, tail: (Keyword, Condition)*)
+
+sealed trait Condition
 
 case class ComparisonCondition(col: Col, operator: Operator, value: Value) extends Condition
 
@@ -19,9 +23,11 @@ trait WhereCondition extends OracleParser {
 
   def where = keyword("WHERE")
 
-  def condition = comparisonCondition | inCondition | betweenCondition | isCondition | pluralCondition
+  def conditions = condition ~ rep(tailCondition) ^^ {case cond ~ tails => Conditions(cond, tails:_*)}
 
-  def conditions = repsep(condition, and | or)
+  def tailCondition = (and | or) ~ condition ^^ {case key ~ cond => (key, cond)}
+
+  def condition = comparisonCondition | inCondition | betweenCondition | isCondition | pluralCondition
 
   def comparisonCondition = col ~ operator ~ value ^^ {
     case col ~ operator ~ value => ComparisonCondition(col, operator, value)

@@ -1,3 +1,5 @@
+package parser
+
 import org.scalatest.FunSuite
 
 class OracleParserTest extends FunSuite {
@@ -39,7 +41,7 @@ class OracleParserTest extends FunSuite {
 
   test("valid cols") {
     assert(
-      Parser._cols("foo, bar").get == Cols(Seq("foo", "bar"))
+      Parser._cols("foo, bar").get == Cols(Col("foo"), Col("bar"))
     )
   }
 
