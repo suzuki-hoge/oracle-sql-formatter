@@ -15,10 +15,10 @@ object SelectResultOf extends WhereFormatter {
     case _ => None
   }
 
-  private def convert(cols: SelectColumns): String = {
+  private def convert(cols: SelectColumns, indent:Indent = super.indent): String = {
     >>((cols: SelectColumns) => cols match {
-      case _: Asterisk => s"\n${__}*"
-      case ColumnsOf(opt, names) => s"$opt\n${__}$names"
+      case _: Asterisk => s"\n${indent}*"
+      case ColumnsOf(opt, names) => s"$opt\n${indent}$names"
     }, cols)
   }
 }

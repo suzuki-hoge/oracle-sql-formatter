@@ -5,6 +5,8 @@ import parser._
 trait OracleFormatter {
   def __ = Indent.current
 
+  val indent:Indent = new Indent
+
   def >>[T](f: T => String, arg: T): String = {
     Indent.++()
     val s = f(arg)

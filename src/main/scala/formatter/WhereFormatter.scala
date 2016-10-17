@@ -39,7 +39,7 @@ object PluralConditionOf extends OracleFormatter {
 
 trait WhereFormatter extends OracleFormatter {
   def convert(result: WhereResult): String = {
-    s"${__}WHERE\n${convert(result.conditions)}"
+    s"${indent}WHERE\n${convert(result.conditions)}"
   }
 
   private def convert(conditions: Conditions): String = {
@@ -51,7 +51,7 @@ trait WhereFormatter extends OracleFormatter {
   }
 
   private def tail(tailCondition: (Keyword, Condition)): String = {
-    >>((tailCondition: (Keyword, Condition)) => s"${__}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)}", tailCondition)
+    >>((tailCondition: (Keyword, Condition)) => s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)}", tailCondition)
   }
 
   private def convertWith(indent: String, condition: Condition): String = condition match {

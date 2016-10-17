@@ -21,3 +21,11 @@ object Indent {
     current
   }
 }
+
+class Indent(depth:Int = 0, size:Int = 2) {
+  private[this] final val SPACE = " "
+  override def toString:String =  SPACE * depth*size
+
+  def inc:Indent = new Indent(depth+1, size)
+  def dec:Indent = if(depth > 0) new Indent(depth-1, size) else this
+}
