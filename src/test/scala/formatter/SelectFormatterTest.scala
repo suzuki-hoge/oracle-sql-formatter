@@ -5,12 +5,13 @@ import parser._
 
 class SelectFormatterTest extends FunSuite {
 
+  val indent = new Indent
   test("select missing where") {
     Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), None)
-      ) ==
+      )(indent) ==
         """SELECT
           |  *
           |FROM
@@ -22,7 +23,7 @@ class SelectFormatterTest extends FunSuite {
     assert(
       SelectFormatter.convert(
         SelectResult(Columns(None, Cols(Col("foo"), Col("bar"))), Table("BOOKS"), None)
-      ) ==
+      )(indent) ==
         """SELECT
           |  foo, bar
           |FROM
@@ -34,7 +35,7 @@ class SelectFormatterTest extends FunSuite {
     assert(
       SelectFormatter.convert(
         SelectResult(Columns(Option(Keyword("distinct")), Cols(Col("foo"), Col("bar"))), Table("BOOKS"), None)
-      ) ==
+      )(indent) ==
         """SELECT DISTINCT
           |  foo, bar
           |FROM
@@ -55,7 +56,7 @@ class SelectFormatterTest extends FunSuite {
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), Option(where))
-      ) ==
+      )(indent) ==
         """SELECT
           |  *
           |FROM

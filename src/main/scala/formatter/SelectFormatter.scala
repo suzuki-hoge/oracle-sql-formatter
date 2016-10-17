@@ -10,21 +10,25 @@ object ColumnsOf extends OracleFormatter {
 }
 
 object SelectResultOf extends WhereFormatter {
-  def unapply(r: SelectResult): Option[(String, String, String)] = r match {
-    case SelectResult(cols, table, where) => Some(convert(cols), convert(table), where.fold("")(convert(_) + "\n"))
+  def unapply(r: SelectResult)(implicit indent:Indent): Option[(String, String, String)] = r match {
+    case SelectResult(cols, table, where) => Some(convert(cols)(indent), convert(table)(indent), where.fold("")(convert(_)(indent) + "\n"))
     case _ => None
   }
 
-  private def convert(cols: SelectColumns, indent:Indent = super.indent): String = {
-    >>((cols: SelectColumns) => cols match {
-      case _: Asterisk => s"\n${indent}*"
-      case ColumnsOf(opt, names) => s"$opt\n${indent}$names"
-    }, cols)
+  private def convert(cols: SelectColumns)(implicit indent:Indent): String = {
+    >>(cols match {
+      case _: Asterisk => s"\n${indent.inc}*"
+      case ColumnsOf(opt, names) => s"$opt\n${indent.inc}$names"
+    })(indent)
+//    >>((cols: SelectColumns) => cols match {
+//      case _: Asterisk => s"\n${indent}*"
+//      case ColumnsOf(opt, names) => s"$opt\n${indent}$names"
+//    }, cols)
   }
 }
 
 object SelectFormatter extends WhereFormatter {
-  def convert(result: SelectResult): String = result match {
+  def convert(result: SelectResult)(implicit indent:Indent): String = result match {
     case SelectResultOf(cols, table, where) => s"SELECT$cols\nFROM\n$table\n$where;"
   }
 }

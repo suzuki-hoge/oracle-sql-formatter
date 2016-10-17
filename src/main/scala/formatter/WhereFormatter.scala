@@ -10,8 +10,8 @@ object ComparisonConditionOf extends OracleFormatter {
 }
 
 object InConditionOf extends OracleFormatter {
-  def unapply(c: InCondition): Option[(String, String, String)] = c match {
-    case InCondition(Col(col), not, vs) => Some(col, not.fold("IN")(_ => "NOT IN"), convert(vs))
+  def unapply(c: InCondition)(implicit indent:Indent): Option[(String, String, String)] = c match {
+    case InCondition(Col(col), not, vs) => Some(col, not.fold("IN")(_ => "NOT IN"), convert(vs)(indent))
     case _ => None
   }
 }
@@ -31,34 +31,36 @@ object IsConditionOf extends OracleFormatter {
 }
 
 object PluralConditionOf extends OracleFormatter {
-  def unapply(c: PluralCondition): Option[(String, String, String, String)] = c match {
-    case PluralCondition(Col(col), Operator(ope), key, vs) => Some(col, ope, convert(key), convert(vs))
+  def unapply(c: PluralCondition)(implicit indent:Indent): Option[(String, String, String, String)] = c match {
+    case PluralCondition(Col(col), Operator(ope), key, vs) => Some(col, ope, convert(key), convert(vs)(indent))
     case _ => None
   }
 }
 
 trait WhereFormatter extends OracleFormatter {
-  def convert(result: WhereResult): String = {
-    s"${indent}WHERE\n${convert(result.conditions)}"
+  def convert(result: WhereResult)(indent:Indent): String = {
+    s"${indent}WHERE\n${convert(result.conditions)(indent)}"
   }
 
-  private def convert(conditions: Conditions): String = {
-    (Seq(head(conditions.head)) ++ conditions.tail.map(tail)).mkString(s"\n")
+  private def convert(conditions: Conditions)(indent:Indent): String = {
+    (Seq(head(conditions.head)(indent)) ++ conditions.tail.map(tail(_)(indent))).mkString(s"\n")
   }
 
-  private def head(condition: Condition): String = {
-    >>((condition: Condition) => convertWith(__, condition), condition)
+  private def head(condition: Condition)(indent:Indent): String = {
+    >>(convertWith(indent.toString, condition)(indent.inc))(indent)
+//    >>((condition: Condition) => convertWith(indent.toString, condition), condition)
   }
 
-  private def tail(tailCondition: (Keyword, Condition)): String = {
-    >>((tailCondition: (Keyword, Condition)) => s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)}", tailCondition)
+  private def tail(tailCondition: (Keyword, Condition))(indent:Indent): String = {
+    >>(s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)(indent)}")(indent)
+//    >>((tailCondition: (Keyword, Condition)) => s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)}", tailCondition)
   }
 
-  private def convertWith(indent: String, condition: Condition): String = condition match {
-    case ComparisonConditionOf(col, ope, v) => s"$indent$col $ope $v"
-    case InConditionOf(col, key, vs) => s"$indent$col $key $vs"
-    case BetweenConditionOf(col, key, v1, v2) => s"$indent$col $key $v1 AND $v2"
-    case IsConditionOf(col, key) => s"$indent$col $key NULL"
-    case PluralConditionOf(col, ope, key, vs) => s"$indent$col $ope $key $vs"
+  private def convertWith(preindent: String, condition: Condition)(implicit indent:Indent): String = condition match {
+    case ComparisonConditionOf(col, ope, v) => s"$preindent$col $ope $v"
+    case InConditionOf(col, key, vs) => s"$preindent$col $key $vs"
+    case BetweenConditionOf(col, key, v1, v2) => s"$preindent$col $key $v1 AND $v2"
+    case IsConditionOf(col, key) => s"$preindent$col $key NULL"
+    case PluralConditionOf(col, ope, key, vs) => s"$preindent$col $ope $key $vs"
   }
 }

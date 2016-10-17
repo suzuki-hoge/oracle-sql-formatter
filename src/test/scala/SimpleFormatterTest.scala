@@ -5,6 +5,7 @@ import parser.Keyword
 class SimpleFormatterTest extends FunSuite {
   test("select re-format") {
     Indent.init("  ")
+    val indent = new Indent
     assert(
       SimpleFormatter.select(
         """select * from books where name = 'foo';

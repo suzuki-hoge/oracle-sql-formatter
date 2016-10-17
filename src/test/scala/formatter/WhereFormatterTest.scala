@@ -13,12 +13,14 @@ class WhereFormatterTest extends FunSuite {
 
   def create(head: Condition, tails: (Keyword, Condition)*): WhereResult = WhereResult(Conditions(head, tails: _*))
 
+  val indent = new Indent
+
   test("condition") {
     Indent.init("  ")
     assert(
       Formatter.convert(
         create(ComparisonCondition(Col("name"), Operator("="), StringValue("foo")))
-      ) ==
+      )(indent) ==
         """WHERE
           |  name = 'foo'""".stripMargin
     )
@@ -27,7 +29,7 @@ class WhereFormatterTest extends FunSuite {
     assert(
       Formatter.convert(
         create(InCondition(Col("name"), None, Values(StringValue("foo"), StringValue("bar"))))
-      ) ==
+      )(indent) ==
         """WHERE
           |  name IN (
           |    'foo'
@@ -39,7 +41,7 @@ class WhereFormatterTest extends FunSuite {
     assert(
       Formatter.convert(
         create(BetweenCondition(Col("rate"), not, IntValue("1000"), IntValue("2000")))
-      ) ==
+      )(indent) ==
         """WHERE
           |  rate NOT BETWEEN 1000 AND 2000""".stripMargin
     )
@@ -48,7 +50,7 @@ class WhereFormatterTest extends FunSuite {
     assert(
       Formatter.convert(
         create(IsCondition(Col("job"), not))
-      ) ==
+      )(indent) ==
         """WHERE
           |  job IS NOT NULL""".stripMargin
     )
@@ -57,7 +59,7 @@ class WhereFormatterTest extends FunSuite {
     assert(
       Formatter.convert(
         create(PluralCondition(Col("location"), Operator("="), Keyword("any"), Values(StringValue("foo"), StringValue("bar"))))
-      ) ==
+      )(indent) ==
         """WHERE
           |  location = ANY (
           |    'foo'
@@ -74,7 +76,7 @@ class WhereFormatterTest extends FunSuite {
           ComparisonCondition(Col("name"), Operator("="), StringValue("foo")),
           (Keyword("and"), PluralCondition(Col("rate"), Operator("="), Keyword("any"), Values(IntValue("1000"), IntValue("2000"))))
         )
-      ) ==
+      )(indent) ==
         """WHERE
           |  name = 'foo'
           |  AND rate = ANY (

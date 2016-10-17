@@ -5,24 +5,28 @@ import parser._
 trait OracleFormatter {
   def __ = Indent.current
 
-  val indent:Indent = new Indent
+//  val indent:Indent = new Indent
 
-  def >>[T](f: T => String, arg: T): String = {
-    Indent.++()
-    val s = f(arg)
-    Indent.--()
-    s
-  }
+//  def >>[T](f: T => String, arg: T): String = {
+//    Indent.++()
+//    val s = f(arg)
+//    Indent.--()
+//    s
+//  }
 
-  def brc[T](f: T => String, arg: T): String = {
-    var s = "(\n"
-    Indent.++()
-    s += f(arg)
-    Indent.--()
-    s += s"\n${__})"
+  def >>(value:String)(indent:Indent):String = s"${indent.inc}${value}"
 
-    s
-  }
+  def brc(value:String)(indent:Indent):String = s"(\n${value}\n${indent})"
+
+//  def brc[T](f: T => String, arg: T): String = {
+//    var s = "(\n"
+//    Indent.++()
+//    s += f(arg)
+//    Indent.--()
+//    s += s"\n${__})"
+//
+//    s
+//  }
 
   def convert(col: Col): String = {
     col.value.toLowerCase
@@ -36,8 +40,9 @@ trait OracleFormatter {
     keyword.value.toUpperCase
   }
 
-  def convert(table: Table): String = {
-    >>((table: Table) => s"${__}${table.value.toLowerCase}", table)
+  def convert(table: Table)(indent:Indent): String = {
+    >>(table.value.toLowerCase)(indent)
+//    s"${indent.inc}${table.value.toLowerCase}"
   }
 
   def convert(value: Value): String = {
@@ -47,8 +52,8 @@ trait OracleFormatter {
     }
   }
 
-  def convert(values: Values): String = {
-    brc((values: Values) => s"${__}${values.values.map(convert).mkString(s"\n${__}, ")}"
-      , values)
+  def convert(values: Values)(indent:Indent): String = {
+    brc(indent.inc.toString + values.values.map(convert).mkString(s"\n${indent.inc}, "))(indent)
+//    s"(\n${indent.inc}${values.values.map(convert).mkString(s"\n${indent.inc}, ")}\n${indent})"
   }
 }
