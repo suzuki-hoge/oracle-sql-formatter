@@ -7,7 +7,6 @@ class SelectFormatterTest extends FunSuite {
 
   val indent = new Indent
   test("select missing where") {
-    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), None)
@@ -19,7 +18,6 @@ class SelectFormatterTest extends FunSuite {
           |;""".stripMargin
     )
 
-    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Columns(None, Cols(Col("foo"), Col("bar"))), Table("BOOKS"), None)
@@ -31,7 +29,6 @@ class SelectFormatterTest extends FunSuite {
           |;""".stripMargin
     )
 
-    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Columns(Option(Keyword("distinct")), Cols(Col("foo"), Col("bar"))), Table("BOOKS"), None)
@@ -52,7 +49,6 @@ class SelectFormatterTest extends FunSuite {
       )
     )
 
-    Indent.init("  ")
     assert(
       SelectFormatter.convert(
         SelectResult(Asterisk("*"), Table("books"), Option(where))

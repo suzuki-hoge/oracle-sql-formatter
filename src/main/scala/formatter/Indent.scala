@@ -27,5 +27,5 @@ class Indent(depth:Int = 0, size:Int = 2) {
   override def toString:String =  SPACE * depth*size
 
   def inc:Indent = new Indent(depth+1, size)
-  def dec:Indent = if(depth > 0) new Indent(depth-1, size) else this
+  def dec:Indent = new Indent(depth-1, size)
 }

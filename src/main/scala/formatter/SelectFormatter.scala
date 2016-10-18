@@ -19,7 +19,7 @@ object SelectResultOf extends WhereFormatter {
     >>(cols match {
       case _: Asterisk => s"\n${indent.inc}*"
       case ColumnsOf(opt, names) => s"$opt\n${indent.inc}$names"
-    })(indent)
+    })(indent.dec)
 //    >>((cols: SelectColumns) => cols match {
 //      case _: Asterisk => s"\n${indent}*"
 //      case ColumnsOf(opt, names) => s"$opt\n${indent}$names"

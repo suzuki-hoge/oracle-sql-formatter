@@ -52,7 +52,7 @@ trait WhereFormatter extends OracleFormatter {
   }
 
   private def tail(tailCondition: (Keyword, Condition))(indent:Indent): String = {
-    >>(s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)(indent)}")(indent)
+    >>(s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)(indent.inc)}")(indent)
 //    >>((tailCondition: (Keyword, Condition)) => s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)}", tailCondition)
   }
 

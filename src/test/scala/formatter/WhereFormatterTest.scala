@@ -16,7 +16,6 @@ class WhereFormatterTest extends FunSuite {
   val indent = new Indent
 
   test("condition") {
-    Indent.init("  ")
     assert(
       Formatter.convert(
         create(ComparisonCondition(Col("name"), Operator("="), StringValue("foo")))
@@ -25,7 +24,6 @@ class WhereFormatterTest extends FunSuite {
           |  name = 'foo'""".stripMargin
     )
 
-    Indent.init("  ")
     assert(
       Formatter.convert(
         create(InCondition(Col("name"), None, Values(StringValue("foo"), StringValue("bar"))))
@@ -37,7 +35,6 @@ class WhereFormatterTest extends FunSuite {
           |  )""".stripMargin
     )
 
-    Indent.init("  ")
     assert(
       Formatter.convert(
         create(BetweenCondition(Col("rate"), not, IntValue("1000"), IntValue("2000")))
@@ -46,7 +43,6 @@ class WhereFormatterTest extends FunSuite {
           |  rate NOT BETWEEN 1000 AND 2000""".stripMargin
     )
 
-    Indent.init("  ")
     assert(
       Formatter.convert(
         create(IsCondition(Col("job"), not))
@@ -55,7 +51,6 @@ class WhereFormatterTest extends FunSuite {
           |  job IS NOT NULL""".stripMargin
     )
 
-    Indent.init("  ")
     assert(
       Formatter.convert(
         create(PluralCondition(Col("location"), Operator("="), Keyword("any"), Values(StringValue("foo"), StringValue("bar"))))
@@ -69,7 +64,6 @@ class WhereFormatterTest extends FunSuite {
   }
 
   test("conditions") {
-    Indent.init("  ")
     assert(
       Formatter.convert(
         create(
