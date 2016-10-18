@@ -48,12 +48,10 @@ trait WhereFormatter extends OracleFormatter {
 
   private def head(condition: Condition)(indent:Indent): String = {
     >>(convertWith(indent.toString, condition)(indent.inc))(indent)
-//    >>((condition: Condition) => convertWith(indent.toString, condition), condition)
   }
 
   private def tail(tailCondition: (Keyword, Condition))(indent:Indent): String = {
     >>(s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)(indent.inc)}")(indent)
-//    >>((tailCondition: (Keyword, Condition)) => s"${indent}${convert(tailCondition._1)} ${convertWith("", tailCondition._2)}", tailCondition)
   }
 
   private def convertWith(preindent: String, condition: Condition)(implicit indent:Indent): String = condition match {
